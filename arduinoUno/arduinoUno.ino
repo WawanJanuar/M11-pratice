@@ -11,16 +11,16 @@ const char* WIFI_PASSWORD = "PASSWORD_WIFI_KAMU";
 #define API_KEY "API_KEY_FIREBASE_KAMU"
 
 // URL Realtime Database, contoh: "https://project-kamu-default-rtdb.firebaseio.com/"
-#define DATABASE_URL "URL_DATABASE_KAMU"
+#define DATABASE_URL "https://m11arduinuoniot-default-rtdb.firebaseio.com/"
 
 // email & password user yang kamu buat di Authentication (Email/Password)
 #define USER_EMAIL "email_user@contoh.com"
 #define USER_PASSWORD "password_user"
 
 // ====== PIN SENSOR ======
-#define DHTPIN 23        // sesuaikan dengan wiring kamu
-#define DHTTYPE DHT11    // atau DHT22
-#define LDR_PIN 34       // pin analog untuk LDR (contoh)
+#define DHTPIN 23  
+#define DHTTYPE DHT11 
+#define LDR_PIN 34 
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -29,7 +29,7 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 unsigned long sendDataPrevMillis = 0;
-unsigned long timerDelay = 5000; // kirim data tiap 5 detik
+unsigned long timerDelay = 5000; 
 
 void connectWiFi() {
   Serial.print("Menghubungkan ke WiFi");
