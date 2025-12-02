@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard IoT Firebase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .card {
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 10px 0;
+      background: #f0f4ff;
+    }
+    .label {
+      font-size: 14px;
+      color: #555;
+    }
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    #dashboard {
+      display: none;
+    }
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      box-sizing: border-box;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dashboard Greenhouse</h1>
+
+    <!-- FORM LOGIN -->
+    <div id="loginForm">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="loginBtn">Login</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+      <button id="logoutBtn">Logout</button>
+
+      <div class="card">
+        <div class="label">Suhu (°C)</div>
+        <div class="value" id="tempValue">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Kelembaban (%)</div>
+        <div class="value" id="humValue">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Cahaya (LDR Raw)</div>
+        <div class="value" id="lightValue">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase v10 (modular) via CDN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+    // ====== MASUKKAN CONFIG FIREBASE KAMU DI SINI ======
+    const firebaseConfig = {
+      apiKey: "API_KEY_KAMU",
+      authDomain: "PROJECT_ID_KAMU.firebaseapp.com",
+      databaseURL: "https://PROJECT_ID_KAMU-default-rtdb.firebaseio.com",
+      projectId: "PROJECT_ID_KAMU",
+      storageBucket: "PROJECT_ID_KAMU.appspot.com",
+      messagingSenderId: "XXXXXXX",
+      appId: "1:XXXXXXX:web:XXXXXXXX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const loginForm = document.getElementById("loginForm");
+    const dashboard = document.getElementById("dashboard");
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const tempValue = document.getElementById("tempValue");
+    const humValue = document.getElementById("humValue");
+    const lightValue = document.getElementById("lightValue");
+
+    // === LOGIN ===
+    loginBtn.addEventListener("click", () => {
+      const email = emailInput.value;
+      const pass = passInput.value;
+
+      signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          loginForm.style.display = "none";
+          dashboard.style.display = "block";
+          listenToSensors();
+        })
+        .catch(err => {
+          alert("Login gagal: " + err.message);
+        });
+    });
+
+    // === LOGOUT ===
+    logoutBtn.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        dashboard.style.display = "none";
+        loginForm.style.display = "block";
+      });
+    });
+
+    // === LISTEN DATA SENSOR ===
+    function listenToSensors() {
+      // path harus sama dengan yang kamu set di Arduino
+      const sensorRef = ref(db, "greenhouse/sensors");
+      onValue(sensorRef, snapshot => {
+        const data = snapshot.val() || {};
+        if (data.temperature !== undefined) {
+          tempValue.textContent = data.temperature.toFixed(1) + " °C";
+        }
+        if (data.humidity !== undefined) {
+          humValue.textContent = data.humidity.toFixed(1) + " %";
+        }
+        if (data.light !== undefined) {
+          lightValue.textContent = data.light;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
