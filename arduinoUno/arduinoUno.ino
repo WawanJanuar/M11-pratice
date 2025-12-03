@@ -6,10 +6,10 @@ const char* ssid = "INLA SUMUT";          //nama Wi-Fi anda (SSID)
 const char* password = "InlaSumut2024go";  //password Wi-Fi anda
 
 // Firebase credentials
-#define API_KEY "AIzaSyAQapzuQJa2s_OFCwna9rcrvea4i15hjl4"  //Found in Project Settings > General
-#define DATABASE_URL "https://m11arduinunoiot-default-rtdb.firebaseio.com"  //From Realtime Database URL
+#define API_KEY "AIzaSyA1zSkKIJDowiA7vcOrhyCFT7kyJIdlCAY"  //Found in Project Settings > General
+#define DATABASE_URL "https://m11-iot-default-rtdb.asia-southeast1.firebasedatabase.app"  //From Realtime Database URL
 #define USER_EMAIL "valent@gmail.com"  //email user saat membuat database
-#define USER_PASSWORD "admin123"  //password user yang telah didaftarkan
+#define USER_PASSWORD "sokasik"  //password user yang telah didaftarkan
 
 #define dht 23
 #define ldr 19
