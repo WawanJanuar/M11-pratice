@@ -1,190 +1,120 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dashboard IoT Firebase</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 480px;
-      margin: 40px auto;
-      background: #fff;
-      padding: 24px 20px 30px;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    }
-    h1 {
-      text-align: center;
-      margin: 0 0 8px;
-    }
-    h2 {
-      text-align: center;
-      margin: 8px 0 20px;
-      font-weight: 600;
-    }
-    .card {
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin: 10px 0;
-      background: #f0f4ff;
-    }
-    .label {
-      font-size: 14px;
-      color: #555;
-    }
-    .value {
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 4px;
-    }
-    #dashboard {
-      display: none;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      box-sizing: border-box;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-    }
-    button {
-      cursor: pointer;
-      border: none;
-      background: #ececec;
-      font-weight: 600;
-    }
-    #logoutBtn {
-      margin-bottom: 12px;
-      background: #f8d7da;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script> 
+    //LOGIN DAN LOGOUT
+    document.getElementById("loginBtn").addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+            loginForm.style.display = "none";
+            dashboard.style.display = "block";
+            listenToSensors();
+        })
+        .catch(err => alert("Login gagal: " + err.message));
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => {
+        dashboard.style.display = "none";
+        loginForm.style.display = "block";
+    });
+});
+  //LOGIN DAN LOGOUT
+document.getElementById("loginBtn").addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+            loginForm.style.display = "none";
+            dashboard.style.display = "block";
+            listenToSensors();
+        })
+        .catch(err => alert("Login gagal: " + err.message));
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => {
+        dashboard.style.display = "none";
+        loginForm.style.display = "block";
+    });
+});
+//MENAMPILKAN DATA SENSOR
+function listenToSensors() {
+    const sensorRef = ref(db, "greenhouse/sensors");
+
+    onValue(sensorRef, (snapshot) => {
+        const d = snapshot.val() || {};
+
+        updateSoil(d.soilMoisture);
+        updateLight(d.lightLevel);
+        updateMotion(d.motion);
+    });
+}
+
+function updateSoil(value) {
+    document.getElementById("soilMoisture").innerText = value + " %";
+    const status = value < 30 ? "Kering" : value < 70 ? "Cukup" : "Basah";
+    document.getElementById("soilStatus").innerText = status;
+}
+
+function updateLight(value) {
+    document.getElementById("lightLevel").innerText = value + " %";
+    const status = value < 30 ? "Redup" : value < 70 ? "Cukup" : "Terang";
+    document.getElementById("lightStatus").innerText = status;
+}
+
+function updateMotion(value) {
+    document.getElementById("motion").innerText = value ? "Terdeteksi" : "Tidak Terdeteksi";
+    const status = value ? "Ada Gerakan" : "Aman";
+    document.getElementById("motionStatus").innerText = status;
+}
+
+  
+
+  </script>
+  <title>M11 IOT Firebase x iot</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Dashboard Greenhouse</h1>
 
-    <!-- FORM LOGIN -->
+    <!-- LOGIN -->
     <div id="loginForm">
-      <h2>Login</h2>
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="loginBtn">Login</button>
+        <h2>Smart Plant Green House</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button id="loginBtn">Login</button>
     </div>
 
     <!-- DASHBOARD -->
-    <div id="dashboard">
-      <button id="logoutBtn">Logout</button>
+    <div id="dashboard" style="display:none;">
+        <h1>Smart Plant Green House</h1>
 
-      <div class="card">
-        <div class="label">Suhu (°C)</div>
-        <div class="value" id="tempValue">-</div>
-      </div>
+        <div class="card">
+            <h3>Kelembaban Tanah</h3>
+            <div id="soilMoisture">-- %</div>
+            <span id="soilStatus"></span>
+        </div>
 
-      <div class="card">
-        <div class="label">Kelembaban (%)</div>
-        <div class="value" id="humValue">-</div>
-      </div>
+        <div class="card">
+            <h3>Tingkat Cahaya</h3>
+            <div id="lightLevel">-- %</div>
+            <span id="lightStatus"></span>
+        </div>
 
-      <div class="card">
-        <div class="label">Cahaya (LDR Raw)</div>
-        <div class="value" id="lightValue">-</div>
-      </div>
+        <div class="card">
+            <h3>Gerakan (PIR)</h3>
+            <div id="motion">--</div>
+            <span id="motionStatus"></span>
+        </div>
+
+        <button id="logoutBtn">Logout</button>
     </div>
-  </div>
 
-  <!-- Firebase v10 (modular) via CDN -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-
-    // ====== CONFIG FIREBASE PROJECT m11arduinuoniot ======
-    const firebaseConfig = {
-      apiKey: "AIzaSyAQapzuQJa2s_OFCwna9rcrvea4il5hjl4",
-      authDomain: "m11arduinuoniot.firebaseapp.com",
-      databaseURL: "https://m11arduinuoniot-default-rtdb.firebaseio.com/",
-      projectId: "m11arduinuoniot",
-      storageBucket: "m11arduinuoniot.firebasestorage.app",
-      messagingSenderId: "1044858032582",
-      appId: "1:1044858032582:web:45cbc04da7d2b47876d3c7",
-      measurementId: "G-SPYBW3PY1D"
-    };
-
-    console.log("Firebase config dari HTML:", firebaseConfig);
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    const loginForm = document.getElementById("loginForm");
-    const dashboard = document.getElementById("dashboard");
-    const emailInput = document.getElementById("email");
-    const passInput = document.getElementById("password");
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    const tempValue = document.getElementById("tempValue");
-    const humValue = document.getElementById("humValue");
-    const lightValue = document.getElementById("lightValue");
-
-    // === LOGIN ===
-    loginBtn.addEventListener("click", () => {
-      const email = emailInput.value.trim();
-      const pass = passInput.value.trim();
-
-      if (!email || !pass) {
-        alert("Isi email dan password dulu.");
-        return;
-      }
-
-      signInWithEmailAndPassword(auth, email, pass)
-        .then(() => {
-          loginForm.style.display = "none";
-          dashboard.style.display = "block";
-          listenToSensors();
-        })
-        .catch(err => {
-          alert("Login gagal: " + err.message);
-        });
-    });
-
-    // === LOGOUT ===
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth)
-        .then(() => {
-          dashboard.style.display = "none";
-          loginForm.style.display = "block";
-        })
-        .catch(err => {
-          alert("Logout gagal: " + err.message);
-        });
-    });
-
-    // === LISTEN DATA SENSOR ===
-    function listenToSensors() {
-      // path harus sama dengan yang diset di Arduino
-      const sensorRef = ref(db, "greenhouse/sensors");
-      onValue(sensorRef, snapshot => {
-        const data = snapshot.val() || {};
-        if (data.temperature !== undefined) {
-          tempValue.textContent = data.temperature.toFixed(1) + " °C";
-        }
-        if (data.humidity !== undefined) {
-          humValue.textContent = data.humidity.toFixed(1) + " %";
-        }
-        if (data.light !== undefined) {
-          lightValue.textContent = data.light;
-        }
-      });
-    }
-  </script>
 </body>
+
 </html>
