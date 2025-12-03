@@ -3,24 +3,21 @@
 #include "DHT.h"
 
 // ====== WIFI CREDENTIALS ======
-const char* WIFI_SSID = "NAMA_WIFI_KAMU";
-const char* WIFI_PASSWORD = "PASSWORD_WIFI_KAMU";
+const char* WIFI_SSID     = "W.Ca";
+const char* WIFI_PASSWORD = "WawanPrivat1";
 
 // ====== FIREBASE CREDENTIALS ======
-// API key → ambil di Firebase Console: Project settings → General
-#define API_KEY "API_KEY_FIREBASE_KAMU"
-
-// URL Realtime Database, contoh: "https://project-kamu-default-rtdb.firebaseio.com/"
+#define API_KEY      "AIzaSyAQapzuQJa2s_OFCwna9rcrvea4il5hjl4"
 #define DATABASE_URL "https://m11arduinuoniot-default-rtdb.firebaseio.com/"
 
-// email & password user yang kamu buat di Authentication (Email/Password)
-#define USER_EMAIL "email_user@contoh.com"
-#define USER_PASSWORD "password_user"
+// email & password user yang dibuat di Authentication (Email/Password)
+#define USER_EMAIL    "stepen@iot.com"
+#define USER_PASSWORD "sokasik"
 
 // ====== PIN SENSOR ======
-#define DHTPIN 23  
-#define DHTTYPE DHT11 
-#define LDR_PIN 34 
+#define DHTPIN 23        // sesuaikan dengan wiring
+#define DHTTYPE DHT11    // atau DHT22
+#define LDR_PIN 34       // pin analog untuk LDR (contoh)
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -29,7 +26,7 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 unsigned long sendDataPrevMillis = 0;
-unsigned long timerDelay = 5000; 
+unsigned long timerDelay = 5000; // kirim data tiap 5 detik
 
 void connectWiFi() {
   Serial.print("Menghubungkan ke WiFi");
@@ -66,7 +63,6 @@ void setup() {
 }
 
 void loop() {
-  // pastikan WiFi tetap terhubung
   if (WiFi.status() != WL_CONNECTED) {
     connectWiFi();
   }
@@ -75,11 +71,11 @@ void loop() {
     sendDataPrevMillis = millis();
 
     float h = dht.readHumidity();
-    float t = dht.readTemperature(); // Celcius
+    float t = dht.readTemperature();
     int lightRaw = analogRead(LDR_PIN);
 
     if (isnan(h) || isnan(t)) {
-      Serial.println("Gagal baca DHT!");
+      Serial.println("Gagal baca sensor DHT!");
       return;
     }
 
@@ -90,8 +86,6 @@ void loop() {
     Serial.print("  LDR: ");
     Serial.println(lightRaw);
 
-    // path contoh: /greenhouse/sensors
-    // bebas kamu ubah, yang penting sama dengan yang dipakai di HTML
     String basePath = "/greenhouse/sensors";
 
     Firebase.RTDB.setFloat(&fbdo, basePath + "/temperature", t);
