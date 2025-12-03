@@ -3,12 +3,12 @@
 #include "DHT.h"
 
 // ====== WIFI CREDENTIALS ======
-const char* WIFI_SSID     = "W.Ca";
-const char* WIFI_PASSWORD = "WawanPrivat1";
+const char* WIFI_SSID     = "INLA SUMUT";
+const char* WIFI_PASSWORD = "InlaSumut2024go";
 
 // ====== FIREBASE CREDENTIALS ======
-#define API_KEY      "AIzaSyAQapzuQJa2s_OFCwna9rcrvea4il5hjl4"
-#define DATABASE_URL "https://m11arduinuoniot-default-rtdb.firebaseio.com/"
+#define API_KEY      "AIzaSyAQapzuQJa2s_OFCwna9rcrvea4i15hjl4"
+#define DATABASE_URL "https://m11arduinunoiot-default-rtdb.firebaseio.com/"
 
 // email & password user yang dibuat di Authentication (Email/Password)
 #define USER_EMAIL    "stepen@iot.com"
